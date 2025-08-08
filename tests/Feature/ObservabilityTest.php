@@ -5,9 +5,7 @@ declare(strict_types=1);
 use Grazulex\ShareLink\Events\ShareLinkAccessed;
 use Grazulex\ShareLink\Events\ShareLinkCreated;
 use Grazulex\ShareLink\Models\ShareLink;
-use Grazulex\ShareLink\Support\ShareLinkObserver;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
 
 it('logs created and accessed events when observability enabled', function (): void {
     config()->set('sharelink.observability.enabled', true);

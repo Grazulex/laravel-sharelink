@@ -6,7 +6,6 @@ namespace Grazulex\ShareLink\Services;
 
 use DateTimeInterface;
 use Grazulex\ShareLink\Events\ShareLinkCreated;
-use Grazulex\ShareLink\Events\ShareLinkRevoked;
 use Grazulex\ShareLink\Models\ShareLink as ShareLinkModel;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;

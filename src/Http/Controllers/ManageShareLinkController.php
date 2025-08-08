@@ -28,19 +28,17 @@ class ManageShareLinkController
 
         // Optional gate authorization
         $ability = config('sharelink.management.gate');
-        if (is_string($ability) && $ability !== '') {
-            if (Gate::denies($ability, $model)) {
-                return ResponseFacade::json([
-                    'status' => 403,
-                    'code' => 'sharelink.forbidden',
-                    'title' => 'Forbidden',
-                    'detail' => 'You are not authorized to manage this link.',
-                ], 403);
-            }
+        if (is_string($ability) && $ability !== '' && Gate::denies($ability, [$model])) {
+            return ResponseFacade::json([
+                'status' => 403,
+                'code' => 'sharelink.forbidden',
+                'title' => 'Forbidden',
+                'detail' => 'You are not authorized to manage this link.',
+            ], 403);
         }
 
-    $revoker = new ShareLinkRevoker();
-    $revoker->revoke($model);
+        $revoker = new ShareLinkRevoker();
+        $revoker->revoke($model);
 
         return (new ShareLinkResource($model))->response();
     }
@@ -69,15 +67,13 @@ class ManageShareLinkController
 
         // Optional gate authorization
         $ability = config('sharelink.management.gate');
-        if (is_string($ability) && $ability !== '') {
-            if (Gate::denies($ability, $model)) {
-                return ResponseFacade::json([
-                    'status' => 403,
-                    'code' => 'sharelink.forbidden',
-                    'title' => 'Forbidden',
-                    'detail' => 'You are not authorized to manage this link.',
-                ], 403);
-            }
+        if (is_string($ability) && $ability !== '' && Gate::denies($ability, [$model])) {
+            return ResponseFacade::json([
+                'status' => 403,
+                'code' => 'sharelink.forbidden',
+                'title' => 'Forbidden',
+                'detail' => 'You are not authorized to manage this link.',
+            ], 403);
         }
 
         $manager->extend($model, $hours);

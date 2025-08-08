@@ -9,10 +9,10 @@ use Grazulex\ShareLink\Console\ListShareLinks;
 use Grazulex\ShareLink\Console\PruneShareLinks;
 use Grazulex\ShareLink\Console\RevokeShareLink;
 use Grazulex\ShareLink\Services\ShareLinkManager;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Events\Dispatcher;
 use Grazulex\ShareLink\Support\ShareLinkObserver;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\ServiceProvider;
 
 class ShareLinkServiceProvider extends ServiceProvider
 {

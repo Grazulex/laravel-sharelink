@@ -20,10 +20,12 @@ class RevokeShareLink extends Command
         $model = ShareLink::query()->where('token', $token)->first();
         if (! $model) {
             $this->error('Share link not found');
+
             return self::FAILURE;
         }
         (new ShareLinkRevoker())->revoke($model);
         $this->info('Share link revoked');
+
         return self::SUCCESS;
     }
 }

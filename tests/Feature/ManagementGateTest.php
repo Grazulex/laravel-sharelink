@@ -15,7 +15,7 @@ beforeEach(function (): void {
 it('denies management actions when gate denies', function (): void {
     $model = ShareLink::create(['resource' => '/tmp/foo.txt', 'token' => 'gate-'.bin2hex(random_bytes(3))]);
 
-    Gate::define('manage-sharelinks', function (?object $user = null, $link): bool {
+    Gate::define('manage-sharelinks', function (?object $user, $link): bool {
         return false;
     });
 
@@ -26,7 +26,7 @@ it('denies management actions when gate denies', function (): void {
 it('allows management actions when gate allows', function (): void {
     $model = ShareLink::create(['resource' => '/tmp/foo.txt', 'token' => 'gate-'.bin2hex(random_bytes(3))]);
 
-    Gate::define('manage-sharelinks', function (?object $user = null, $link): bool {
+    Gate::define('manage-sharelinks', function (?object $user, $link): bool {
         return true;
     });
 

@@ -6,6 +6,7 @@ namespace Grazulex\ShareLink\Console;
 
 use Grazulex\ShareLink\Services\ShareLinkManager;
 use Illuminate\Console\Command;
+use Throwable;
 
 class CreateShareLink extends Command
 {
@@ -47,8 +48,9 @@ class CreateShareLink extends Command
                 /** @var array<string,mixed> $meta */
                 $meta = json_decode($metaJson, true, 512, JSON_THROW_ON_ERROR);
                 $builder->metadata($meta);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $this->error('Invalid metadata JSON: '.$e->getMessage());
+
                 return self::FAILURE;
             }
         }

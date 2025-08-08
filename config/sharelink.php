@@ -14,9 +14,9 @@ return [
         'middleware' => [
             // e.g., 'web', 'auth' — left empty by default for tests
         ],
-    // Optional Gate ability to authorize management actions (revoke/extend) against the ShareLink model
-    // Example: set to 'manage-sharelinks' and define Gate::define('manage-sharelinks', fn ($user, $link) => ...)
-    'gate' => env('SHARELINK_MANAGEMENT_GATE', null),
+        // Optional Gate ability to authorize management actions (revoke/extend) against the ShareLink model
+        // Example: set to 'manage-sharelinks' and define Gate::define('manage-sharelinks', fn ($user, $link) => ...)
+        'gate' => env('SHARELINK_MANAGEMENT_GATE', null),
     ],
     'signed' => [
         // If enabled, helper methods will generate signed URLs; when required, access must be signed

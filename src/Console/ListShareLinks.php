@@ -24,6 +24,7 @@ class ListShareLinks extends Command
         $rows = $query->limit(50)->get(['token', 'resource', 'expires_at', 'revoked_at', 'click_count']);
         if ($rows->isEmpty()) {
             $this->line('No share links found');
+
             return self::SUCCESS;
         }
         $this->table(['Token', 'Resource', 'Expires', 'Revoked', 'Clicks'], $rows->map(function (ShareLink $m): array {
@@ -35,6 +36,7 @@ class ListShareLinks extends Command
                 (string) $m->click_count,
             ];
         })->all());
+
         return self::SUCCESS;
     }
 }

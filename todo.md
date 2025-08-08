@@ -44,7 +44,7 @@ Source of truth for scope: see `content.txt`.
   - [x] Support Range requests for large files (local files)
   - [x] Optional X-Sendfile / X-Accel-Redirect integration (config flags)
   - [ ] S3: generate temporary signed URLs when configured (Deferred)
-- [ ] JSON API Resources for consistent responses
+- [x] JSON API Resources for consistent responses
   - [x] Standard error format: { status, code, title, detail }
   - [x] Content negotiation (Accept: application/json)
   - [x] Success responses via API Resources
@@ -60,15 +60,15 @@ Source of truth for scope: see `content.txt`.
 
 ## v1.2 – Security & Limits
 
-- [ ] Optional Laravel signed routes (in addition to tokens)
-- [ ] Per-link IP allow/deny lists
-- [ ] Rate limiting per token (throttle middleware integration)
-- [ ] One-time “burn after reading” links (max_clicks=1 + immediate prune)
-- [ ] Password attempt throttling (avoid brute force)
+- [x] Optional Laravel signed routes (in addition to tokens)
+- [x] Per-link IP allow/deny lists
+- [x] Rate limiting per token (throttle middleware integration)
+- [x] One-time “burn after reading” links (max_clicks=1 + immediate revoke/delete)
+- [x] Password attempt throttling (avoid brute force)
 
 ## v1.3 – DevEx & Ops
 
-- [ ] Scheduler wiring for prune command (daily by default, configurable)
+- [x] Scheduler wiring for prune command (daily by default, configurable)
 - [ ] Additional Artisan commands: create, revoke, list
 - [ ] Observability
   - [ ] Optionally log access events (without PII) and expose metrics hooks

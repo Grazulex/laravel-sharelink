@@ -23,6 +23,17 @@ return [
         'ttl' => env('SHARELINK_SIGNED_TTL', 15),
     ],
 
+    'burn' => [
+        // If enabled, links marked as burn-after-reading will be revoked immediately after first successful access
+        'enabled' => env('SHARELINK_BURN_ENABLED', true),
+        // If true, auto-treat max_clicks = 1 as burn-after-reading even without metadata flag
+        'auto_max_clicks' => env('SHARELINK_BURN_AUTO', false),
+        // Strategy can be 'revoke' (default) or 'delete' (hard delete). We keep 'revoke' for audit + prune.
+        'strategy' => env('SHARELINK_BURN_STRATEGY', 'revoke'),
+        // Metadata key used to mark a link as burn-after-reading
+        'flag_key' => 'burn_after_reading',
+    ],
+
     'limits' => [
         'ip' => [
             // Arrays of IPs or CIDR blocks. If 'allow' is non-empty, only those IPs are allowed.
@@ -48,5 +59,14 @@ return [
 
         // If set, use X-Accel-Redirect with this internal location prefix (e.g., '/protected')
         'x_accel_redirect' => env('SHARELINK_X_ACCEL_REDIRECT', null),
+    ],
+
+    'schedule' => [
+        'prune' => [
+            'enabled' => env('SHARELINK_SCHEDULE_PRUNE', true),
+            // Cron expression or aliases like '@daily'; defaults to 3:00 AM daily
+            'expression' => env('SHARELINK_SCHEDULE_PRUNE_EXPRESSION', '0 3 * * *'),
+            'description' => 'sharelink:prune',
+        ],
     ],
 ];

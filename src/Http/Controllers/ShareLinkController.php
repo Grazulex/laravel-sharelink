@@ -6,6 +6,7 @@ namespace Grazulex\ShareLink\Http\Controllers;
 
 use Grazulex\ShareLink\Events\ShareLinkAccessed;
 use Grazulex\ShareLink\Http\Resources\ShareLinkResource;
+use Grazulex\ShareLink\Services\ShareLinkRevoker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
@@ -59,6 +60,25 @@ class ShareLinkController
         // Increment usage and mark audit
         $model->incrementClicks();
         $model->markAccessed($request->ip());
+
+        // Burn-after-reading: revoke immediately after first successful access
+        $burnEnabled = (bool) config('sharelink.burn.enabled', true);
+        if ($burnEnabled) {
+            $flagKey = (string) config('sharelink.burn.flag_key', 'burn_after_reading');
+            $auto = (bool) config('sharelink.burn.auto_max_clicks', false);
+            $isFlagged = (bool) ($model->metadata[$flagKey] ?? false);
+            $isAuto = $auto && (int) ($model->max_clicks ?? 0) === 1;
+            if (($isFlagged || $isAuto) && (int) $model->click_count >= 1) {
+                $strategy = (string) config('sharelink.burn.strategy', 'revoke');
+                if ($strategy === 'delete') {
+                    // Hard delete after first access
+                    $model->delete();
+                } else {
+                    // Default: revoke
+                    (new ShareLinkRevoker())->revoke($model);
+                }
+            }
+        }
 
         $res = $model->resource;
         if (is_string($res)) {

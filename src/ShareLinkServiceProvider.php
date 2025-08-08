@@ -6,6 +6,7 @@ namespace Grazulex\ShareLink;
 
 use Grazulex\ShareLink\Console\PruneShareLinks;
 use Grazulex\ShareLink\Services\ShareLinkManager;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 
 class ShareLinkServiceProvider extends ServiceProvider
@@ -34,6 +35,13 @@ class ShareLinkServiceProvider extends ServiceProvider
             $this->commands([
                 PruneShareLinks::class,
             ]);
+            // Register scheduler callback
+            $this->app->afterResolving(Schedule::class, function (Schedule $schedule): void {
+                if ((bool) config('sharelink.schedule.prune.enabled', true)) {
+                    $expr = (string) config('sharelink.schedule.prune.expression', '0 3 * * *');
+                    $schedule->command('sharelink:prune')->cron($expr)->name('sharelink:prune');
+                }
+            });
         }
     }
 }

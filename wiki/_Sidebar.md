@@ -1,0 +1,15 @@
+- [[Home]]
+- Getting Started
+  - [[Install]]
+  - [[Configuration]]
+  - [[Quickstart]]
+- Usage
+  - [[Endpoints]]
+  - [[API]]
+  - [[CLI]]
+- Guides
+  - [[Security]]
+  - [[Events]]
+- Project
+  - [[Changelog]]
+  - [[Version Matrix]]

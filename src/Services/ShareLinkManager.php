@@ -88,6 +88,19 @@ class PendingShareLink
         return $this;
     }
 
+    public function burnAfterReading(bool $on = true): self
+    {
+        if ($on) {
+            $this->data['max_clicks'] = 1;
+            $key = (string) config('sharelink.burn.flag_key', 'burn_after_reading');
+            $meta = (array) ($this->data['metadata'] ?? []);
+            $meta[$key] = true;
+            $this->data['metadata'] = $meta;
+        }
+
+        return $this;
+    }
+
     public function generate(): ShareLinkModel
     {
         if (! isset($this->data['token']) || $this->data['token'] === '') {

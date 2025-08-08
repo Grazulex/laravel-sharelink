@@ -69,26 +69,25 @@ class EnsureShareLinkIsValid
         $metaAllow = (array) ($model->metadata['ip_allow'] ?? []);
         $metaDeny = (array) ($model->metadata['ip_deny'] ?? []);
 
-        $allowList = array_values(array_filter(array_merge($globalAllow, $metaAllow), static fn ($v) => is_string($v) && $v !== ''));
-        $denyList = array_values(array_filter(array_merge($globalDeny, $metaDeny), static fn ($v) => is_string($v) && $v !== ''));
+        $allowList = array_values(array_filter(array_merge($globalAllow, $metaAllow), static fn ($v): bool => is_string($v) && $v !== ''));
+        $denyList = array_values(array_filter(array_merge($globalDeny, $metaDeny), static fn ($v): bool => is_string($v) && $v !== ''));
 
         $inList = function (string $ip, array $list): bool {
             foreach ($list as $entry) {
-                $entry = trim($entry);
+                $entry = mb_trim($entry);
                 if ($entry === '') {
                     continue;
                 }
                 if (Str::contains($entry, '/')) {
                     // CIDR
-                    if (self::ipInCidr($ip, $entry)) {
+                    if ($this->ipInCidr($ip, $entry)) {
                         return true;
                     }
-                } else {
-                    if ($ip === $entry) {
-                        return true;
-                    }
+                } elseif ($ip === $entry) {
+                    return true;
                 }
             }
+
             return false;
         };
 
@@ -159,7 +158,7 @@ class EnsureShareLinkIsValid
         return $next($request);
     }
 
-    private static function ipInCidr(string $ip, string $cidr): bool
+    private function ipInCidr(string $ip, string $cidr): bool
     {
         if ($ip === '' || $cidr === '') {
             return false;
@@ -178,6 +177,7 @@ class EnsureShareLinkIsValid
         $maskLong = -1 << (32 - $mask);
         $ipNet = $ipLong & $maskLong;
         $subnetNet = $subnetLong & $maskLong;
+
         return $ipNet === $subnetNet;
     }
 }

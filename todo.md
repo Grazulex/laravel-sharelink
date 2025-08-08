@@ -39,17 +39,18 @@ Source of truth for scope: see `content.txt`.
 
 - [ ] File delivery improvements
   - [x] Stream via Storage (private disks)
-  - [ ] Set headers (Content-Type, Content-Length, Cache-Control)
-  - [ ] Support Range requests for large files
-  - [ ] Optional X-Sendfile / X-Accel-Redirect integration
+  - [x] Set headers (Content-Type, Cache-Control) for local and Storage streams
+  - [x] Set Content-Length where available (Storage drivers)
+  - [x] Support Range requests for large files (local files)
+  - [x] Optional X-Sendfile / X-Accel-Redirect integration (config flags)
   - [ ] S3: generate temporary signed URLs when configured
 - [ ] JSON API Resources for consistent responses
   - [x] Standard error format: { status, code, title, detail }
-  - [ ] Content negotiation (Accept: application/json)
-  - [ ] Success responses via API Resources
+  - [x] Content negotiation (Accept: application/json)
+  - [x] Success responses via API Resources
 - [ ] Revocation API
   - [x] Service method to revoke
-  - [ ] Service method to extend links
+  - [x] Service method to extend links
   - [ ] Optional HTTP endpoint(s) guarded by policies
 - [x] Events for extensibility
   - [x] ShareLinkCreated
@@ -80,7 +81,7 @@ Source of truth for scope: see `content.txt`.
 ## Tests – matrix to cover
 
 - [ ] Resources
-  - [ ] File on local/private disk
+  - [x] File on local/private disk (headers validated)
   - [ ] Route target
   - [ ] Model preview (morph target)
 - [ ] Expiration: absolute time vs duration

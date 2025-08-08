@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Grazulex\ShareLink\Services;
 
+use DateTimeInterface;
 use Grazulex\ShareLink\Events\ShareLinkCreated;
 use Grazulex\ShareLink\Events\ShareLinkRevoked;
 use Grazulex\ShareLink\Models\ShareLink as ShareLinkModel;
@@ -20,6 +21,22 @@ class ShareLinkManager
     public function resolveUrl(ShareLinkModel $model): string
     {
         return URL::to('/share/'.$model->token);
+    }
+
+    /**
+     * Extend the expiration by N hours (or set to a specific future time if $hours is null and $until provided).
+     */
+    public function extend(ShareLinkModel $model, ?int $hours = null, ?DateTimeInterface $until = null): ShareLinkModel
+    {
+        if ($until instanceof DateTimeInterface) {
+            $model->expires_at = \Illuminate\Support\Carbon::instance(\Carbon\Carbon::parse($until->format(DATE_ATOM)));
+        } else {
+            $add = $hours ?? 1;
+            $model->expires_at = ($model->expires_at ?? now())->copy()->addHours($add);
+        }
+        $model->save();
+
+        return $model;
     }
 }
 

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Grazulex\ShareLink;
 
+use Grazulex\ShareLink\Console\CreateShareLink;
+use Grazulex\ShareLink\Console\ListShareLinks;
 use Grazulex\ShareLink\Console\PruneShareLinks;
+use Grazulex\ShareLink\Console\RevokeShareLink;
 use Grazulex\ShareLink\Services\ShareLinkManager;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
@@ -34,6 +37,9 @@ class ShareLinkServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 PruneShareLinks::class,
+                CreateShareLink::class,
+                RevokeShareLink::class,
+                ListShareLinks::class,
             ]);
             // Register scheduler callback
             $this->app->afterResolving(Schedule::class, function (Schedule $schedule): void {

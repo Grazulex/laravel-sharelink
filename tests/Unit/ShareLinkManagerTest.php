@@ -16,7 +16,7 @@ it('generates a URL and applies password hashing when provided', function (): vo
 
     expect($model)->toBeInstanceOf(ShareLink::class)
         ->and($model->token)->toBeString()
-        ->and($model->getAttribute('url'))
+        ->and($model->url)
         ->toContain('/share/')
         ->and($model->password)->not->toBe('secret');
 });

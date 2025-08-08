@@ -18,10 +18,17 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable();
             $table->unsignedInteger('max_clicks')->nullable();
             $table->unsignedInteger('click_count')->default(0);
+            $table->timestamp('first_access_at')->nullable();
+            $table->timestamp('last_access_at')->nullable();
+            $table->string('last_ip', 45)->nullable();
             $table->timestamp('revoked_at')->nullable();
             $table->json('metadata')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
+
+            // Helpful indexes
+            $table->index('expires_at');
+            $table->index('revoked_at');
         });
     }
 

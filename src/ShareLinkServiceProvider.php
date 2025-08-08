@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Grazulex\ShareLink;
 
+use Grazulex\ShareLink\Console\PruneShareLinks;
 use Grazulex\ShareLink\Services\ShareLinkManager;
 use Illuminate\Support\ServiceProvider;
 
@@ -28,5 +29,11 @@ class ShareLinkServiceProvider extends ServiceProvider
         }
 
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                PruneShareLinks::class,
+            ]);
+        }
     }
 }

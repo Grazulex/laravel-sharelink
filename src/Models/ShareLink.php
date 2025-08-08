@@ -14,6 +14,9 @@ use Illuminate\Support\Str;
  * @property string $token
  * @property string|null $password
  * @property \Illuminate\Support\Carbon|null $expires_at
+ * @property \Illuminate\Support\Carbon|null $first_access_at
+ * @property \Illuminate\Support\Carbon|null $last_access_at
+ * @property string|null $last_ip
  * @property int|null $max_clicks
  * @property int $click_count
  * @property \Illuminate\Support\Carbon|null $revoked_at
@@ -34,6 +37,8 @@ class ShareLink extends Model
         'resource' => 'array',
         'metadata' => 'array',
         'expires_at' => 'datetime',
+        'first_access_at' => 'datetime',
+        'last_access_at' => 'datetime',
         'revoked_at' => 'datetime',
     ];
 
@@ -50,6 +55,22 @@ class ShareLink extends Model
     public function incrementClicks(): void
     {
         $this->increment('click_count');
+    }
+
+    public function markAccessed(?string $ip): void
+    {
+        if ($this->first_access_at === null) {
+            $this->first_access_at = now();
+        }
+
+        $this->last_access_at = now();
+        $this->last_ip = $ip;
+        $this->save();
+    }
+
+    public function getUrlAttribute(): string
+    {
+        return \Illuminate\Support\Facades\URL::to('/share/'.$this->token);
     }
 
     protected static function booted(): void

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Grazulex\ShareLink\Services;
 
+use Grazulex\ShareLink\Events\ShareLinkCreated;
+use Grazulex\ShareLink\Events\ShareLinkRevoked;
 use Grazulex\ShareLink\Models\ShareLink as ShareLinkModel;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
@@ -63,10 +65,23 @@ class PendingShareLink
 
     public function generate(): ShareLinkModel
     {
+        if (! isset($this->data['token']) || $this->data['token'] === '') {
+            $this->data['token'] = \Illuminate\Support\Str::random(32);
+        }
         $model = ShareLinkModel::create($this->data);
-        /** @var string $url */
-        $url = app(ShareLinkManager::class)->resolveUrl($model);
-        $model->setAttribute('url', $url);
+        event(new ShareLinkCreated($model));
+
+        return $model;
+    }
+}
+
+class ShareLinkRevoker
+{
+    public function revoke(ShareLinkModel $model): ShareLinkModel
+    {
+        $model->revoked_at = now();
+        $model->save();
+        event(new ShareLinkRevoked($model));
 
         return $model;
     }

@@ -23,6 +23,14 @@ class ShareLinkManager
         return URL::to('/share/'.$model->token);
     }
 
+    public function signedUrl(ShareLinkModel $model, ?int $minutes = null): string
+    {
+        $params = ['token' => $model->token];
+        $ttl = $minutes ?? (int) config('sharelink.signed.ttl', 15);
+
+        return URL::temporarySignedRoute('sharelink.show', now()->addMinutes($ttl), $params);
+    }
+
     /**
      * Extend the expiration by N hours (or set to a specific future time if $hours is null and $until provided).
      */

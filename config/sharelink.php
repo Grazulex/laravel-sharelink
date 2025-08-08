@@ -9,14 +9,38 @@ return [
             Grazulex\ShareLink\Http\Middleware\EnsureShareLinkIsValid::class,
         ],
     ],
+    'management' => [
+        'enabled' => env('SHARELINK_MANAGEMENT_ENABLED', true),
+        'middleware' => [
+            // e.g., 'web', 'auth' — left empty by default for tests
+        ],
+    ],
+    'signed' => [
+        // If enabled, helper methods will generate signed URLs; when required, access must be signed
+        'enabled' => env('SHARELINK_SIGNED_ENABLED', true),
+        'required' => env('SHARELINK_SIGNED_REQUIRED', false),
+        // Default TTL in minutes for temporary signed URLs
+        'ttl' => env('SHARELINK_SIGNED_TTL', 15),
+    ],
+
+    'limits' => [
+        'rate' => [
+            'enabled' => env('SHARELINK_RATE_ENABLED', false),
+            // Max attempts allowed within decay seconds per token
+            'max' => env('SHARELINK_RATE_MAX', 60),
+            'decay' => env('SHARELINK_RATE_DECAY', 60), // seconds
+        ],
+        'password' => [
+            'enabled' => env('SHARELINK_PASSWORD_LIMIT_ENABLED', true),
+            'max' => env('SHARELINK_PASSWORD_LIMIT_MAX', 5),
+            'decay' => env('SHARELINK_PASSWORD_LIMIT_DECAY', 600), // seconds
+        ],
+    ],
     'delivery' => [
         // If true and serving local files, set X-Sendfile header instead of streaming
         'x_sendfile' => env('SHARELINK_X_SENDFILE', false),
 
         // If set, use X-Accel-Redirect with this internal location prefix (e.g., '/protected')
         'x_accel_redirect' => env('SHARELINK_X_ACCEL_REDIRECT', null),
-
-        // S3 temporary URL TTL in minutes when using a disk that supports temporaryUrl
-        's3_ttl' => env('SHARELINK_S3_TTL', 5),
     ],
 ];

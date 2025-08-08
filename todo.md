@@ -43,7 +43,7 @@ Source of truth for scope: see `content.txt`.
   - [x] Set Content-Length where available (Storage drivers)
   - [x] Support Range requests for large files (local files)
   - [x] Optional X-Sendfile / X-Accel-Redirect integration (config flags)
-  - [ ] S3: generate temporary signed URLs when configured
+  - [ ] S3: generate temporary signed URLs when configured (Deferred)
 - [ ] JSON API Resources for consistent responses
   - [x] Standard error format: { status, code, title, detail }
   - [x] Content negotiation (Accept: application/json)

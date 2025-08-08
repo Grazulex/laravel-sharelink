@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace Grazulex\ShareLink\Http\Controllers;
 
 use Grazulex\ShareLink\Events\ShareLinkAccessed;
+use Grazulex\ShareLink\Http\Resources\ShareLinkResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Response as ResponseFacade;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Grazulex\ShareLink\Http\Resources\ShareLinkResource;
+use Throwable;
+
+use function function_exists;
 
 class ShareLinkController
 {
@@ -18,16 +22,37 @@ class ShareLinkController
     {
         $model = $request->attributes->get('sharelink');
 
-        // Optional password gate
+        // Optional password gate with throttling
         if ($model->password) {
             $pwd = $request->input('password');
+            $limitEnabled = (bool) config('sharelink.limits.password.enabled', true);
+            $key = 'sharelink:pwd:'.$model->token.':'.($request->ip() ?? 'unknown');
+            if ($limitEnabled && RateLimiter::tooManyAttempts($key, (int) config('sharelink.limits.password.max', 5))) {
+                $retry = RateLimiter::availableIn($key);
+
+                return ResponseFacade::json([
+                    'status' => 429,
+                    'code' => 'password.throttled',
+                    'title' => 'Too many password attempts',
+                    'detail' => 'Try again in '.$retry.' seconds.',
+                ], 429);
+            }
+
             if (! $pwd || ! Hash::check($pwd, $model->password)) {
+                if ($limitEnabled) {
+                    RateLimiter::hit($key, (int) config('sharelink.limits.password.decay', 600));
+                }
+
                 return ResponseFacade::json([
                     'status' => 401,
                     'code' => 'password.invalid',
                     'title' => 'Password required or invalid',
                     'detail' => 'Provide a valid password to access this resource.',
                 ], 401);
+            }
+
+            if ($limitEnabled) {
+                RateLimiter::clear($key);
             }
         }
 
@@ -52,12 +77,12 @@ class ShareLinkController
                 if ($xAccel !== '') {
                     // Map real path to internal prefix if needed; here we assume res is already under the internal location
                     return ResponseFacade::make('', 200, [
-                        'X-Accel-Redirect' => rtrim($xAccel, '/').'/'.ltrim(basename($res), '/'),
+                        'X-Accel-Redirect' => mb_rtrim($xAccel, '/').'/'.mb_ltrim(basename($res), '/'),
                         'Content-Disposition' => (new ResponseHeaderBag())->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, basename($res)),
                         'Cache-Control' => 'no-store',
                     ]);
                 }
-                $mime = \function_exists('mime_content_type') ? (mime_content_type($res) ?: 'application/octet-stream') : 'application/octet-stream';
+                $mime = function_exists('mime_content_type') ? (mime_content_type($res) ?: 'application/octet-stream') : 'application/octet-stream';
                 $size = @filesize($res) ?: null;
 
                 // Handle HTTP Range for partial content when size known
@@ -77,12 +102,12 @@ class ShareLinkController
                                 @fseek($fh, $start);
                                 $remaining = $length;
                                 while ($remaining > 0 && ! feof($fh)) {
-                                    $chunk = fread($fh, (int) min(8192, $remaining));
+                                    $chunk = fread($fh, min(8192, $remaining));
                                     if ($chunk === false) {
                                         break;
                                     }
                                     echo $chunk;
-                                    $remaining -= strlen($chunk);
+                                    $remaining -= mb_strlen($chunk);
                                 }
                                 @fclose($fh);
                             }, 206, [
@@ -137,7 +162,7 @@ class ShareLinkController
                     try {
                         $size = $fs->size($path);
                         $headers['Content-Length'] = (string) $size;
-                    } catch (\Throwable) {
+                    } catch (Throwable) {
                         // ignore if driver does not support size
                     }
 

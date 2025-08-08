@@ -8,7 +8,9 @@ use Closure;
 use Grazulex\ShareLink\Events\ShareLinkExpired;
 use Grazulex\ShareLink\Models\ShareLink;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\URL;
 
 class EnsureShareLinkIsValid
 {
@@ -57,6 +59,49 @@ class EnsureShareLinkIsValid
                 'title' => 'Usage limit reached',
                 'detail' => 'This link has reached its maximum number of clicks.',
             ], 429);
+        }
+
+        // Signed URL validation
+        $signedEnabled = (bool) config('sharelink.signed.enabled', true);
+        $signedRequired = (bool) config('sharelink.signed.required', false);
+        if ($signedEnabled) {
+            $isSigned = $request->hasValidSignature();
+            if ($signedRequired && ! $isSigned) {
+                return Response::json([
+                    'status' => 403,
+                    'code' => 'sharelink.signature_required',
+                    'title' => 'Signature required',
+                    'detail' => 'This link must be accessed with a valid signature.',
+                ], 403);
+            }
+            // If signature params are present but invalid, reject
+            if (($request->query('_signature') || $request->query('signature')) && ! $isSigned) {
+                return Response::json([
+                    'status' => 403,
+                    'code' => 'sharelink.signature_invalid',
+                    'title' => 'Invalid or expired signature',
+                    'detail' => 'The signature is invalid or expired.',
+                ], 403);
+            }
+        }
+
+        // Per-token rate limiting
+        $rateEnabled = (bool) config('sharelink.limits.rate.enabled', false);
+        if ($rateEnabled) {
+            $key = 'sharelink:rate:'.$model->token.':'.($request->ip() ?? 'unknown');
+            $max = (int) config('sharelink.limits.rate.max', 60);
+            $decay = (int) config('sharelink.limits.rate.decay', 60);
+            if (RateLimiter::tooManyAttempts($key, $max)) {
+                $retry = RateLimiter::availableIn($key);
+
+                return Response::json([
+                    'status' => 429,
+                    'code' => 'sharelink.rate_limited',
+                    'title' => 'Too many requests',
+                    'detail' => 'Try again in '.$retry.' seconds.',
+                ], 429);
+            }
+            RateLimiter::hit($key, $decay);
         }
 
         $request->attributes->set('sharelink', $model);

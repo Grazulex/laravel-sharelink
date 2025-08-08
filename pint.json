@@ -23,6 +23,8 @@
     "no_superfluous_elseif": true,
     "no_useless_else": true,
     "no_multiple_statements_per_line": true,
+    "not_operator_with_successor_space": true,
+    "unary_operator_spaces": true,
     "ordered_class_elements": {
       "order": [
         "use_trait",

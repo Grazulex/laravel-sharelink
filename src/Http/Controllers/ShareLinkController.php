@@ -215,6 +215,7 @@ class ShareLinkController
                 if ($cls !== '' && $id !== null && config('app.debug')) {
                     // Fallback simple JSON when no preview route defined
                     event(new ShareLinkAccessed($model));
+
                     return ResponseFacade::json([
                         'status' => 200,
                         'code' => 'sharelink.model_preview',

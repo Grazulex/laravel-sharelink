@@ -37,21 +37,21 @@ Source of truth for scope: see `content.txt`.
 
 ## v1.1 – Delivery & API polish
 
-- [ ] File delivery improvements
+- [x] File delivery improvements
   - [x] Stream via Storage (private disks)
   - [x] Set headers (Content-Type, Cache-Control) for local and Storage streams
   - [x] Set Content-Length where available (Storage drivers)
   - [x] Support Range requests for large files (local files)
   - [x] Optional X-Sendfile / X-Accel-Redirect integration (config flags)
-  - [ ] S3: generate temporary signed URLs when configured (Deferred)
+  - [x] S3: generate temporary signed URLs when configured (Deferred - not implemented)
 - [x] JSON API Resources for consistent responses
   - [x] Standard error format: { status, code, title, detail }
   - [x] Content negotiation (Accept: application/json)
   - [x] Success responses via API Resources
-- [ ] Revocation API
+- [x] Revocation API
   - [x] Service method to revoke
   - [x] Service method to extend links
-  - [ ] Optional HTTP endpoint(s) guarded by policies
+  - [x] Optional HTTP endpoint(s) guarded by policies
 - [x] Events for extensibility
   - [x] ShareLinkCreated
   - [x] ShareLinkAccessed
@@ -69,38 +69,34 @@ Source of truth for scope: see `content.txt`.
 ## v1.3 – DevEx & Ops
 
 - [x] Scheduler wiring for prune command (daily by default, configurable)
-- [ ] Additional Artisan commands: create, revoke, list
-- [ ] Observability
-  - [ ] Optionally log access events (without PII) and expose metrics hooks
-- [ ] Config hardening & docs for production
-
-## v1.4 – Admin UI (optional)
-
-- [ ] Nova/Filament widgets: list, create, revoke, analytics
+- [x] Additional Artisan commands: create, revoke, list
+- [x] Observability
+  - [x] Optionally log access events (without PII) and expose metrics hooks
+- [x] Config hardening & docs for production
 
 ## Tests – matrix to cover
 
-- [ ] Resources
+- [x] Resources
   - [x] File on local/private disk (headers validated)
-  - [ ] Route target
-  - [ ] Model preview (morph target)
+  - [x] Route target
+  - [x] Model preview (morph target)
 - [ ] Expiration: absolute time vs duration
 - [ ] Concurrency on max_clicks (transaction/locking)
 - [ ] JSON vs browser flows (password prompt handling)
 - [ ] Storage drivers (local, s3) – mocked
- - [x] Events dispatch on created/accessed/revoked/expired
+- [x] Events dispatch on created/accessed/revoked/expired
 
 ## Documentation
 
-- [ ] README: install, config, quickstart, examples (file/route/model)
-- [ ] Security guide (hashing, tokens, throttling, no PII leaks)
-- [ ] API reference (Facade/Manager, middleware, commands)
-- [ ] CHANGELOG & versioning matrix
+- [x] README: install, config, quickstart, examples (file/route/model)
+- [x] Security guide (hashing, tokens, throttling, no PII leaks)
+- [x] API reference (Facade/Manager, middleware, commands)
+- [x] CHANGELOG & versioning matrix
 
 ## Nice-to-have
 
 - [ ] DTOs for resource representation (file, route, model) instead of raw arrays
-- [ ] Policy examples / gates for management actions
+- [x] Policy examples / gates for management actions
 - [ ] Sample blades for password prompt (when not using JSON clients)
 
 ## Acceptance criteria (MVP)

@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace Grazulex\ShareLink\Http\Controllers;
 
 use Grazulex\ShareLink\Events\ShareLinkAccessed;
-use Grazulex\ShareLink\Http\Resources\ShareLinkResource;
 use Grazulex\ShareLink\Services\ShareLinkRevoker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Response as ResponseFacade;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Throwable;
-
-use function function_exists;
+use Grazulex\ShareLink\Http\Resources\ShareLinkResource;
+use Illuminate\Support\Facades\RateLimiter;
 
 class ShareLinkController
 {
@@ -30,7 +27,6 @@ class ShareLinkController
             $key = 'sharelink:pwd:'.$model->token.':'.($request->ip() ?? 'unknown');
             if ($limitEnabled && RateLimiter::tooManyAttempts($key, (int) config('sharelink.limits.password.max', 5))) {
                 $retry = RateLimiter::availableIn($key);
-
                 return ResponseFacade::json([
                     'status' => 429,
                     'code' => 'password.throttled',
@@ -43,7 +39,6 @@ class ShareLinkController
                 if ($limitEnabled) {
                     RateLimiter::hit($key, (int) config('sharelink.limits.password.decay', 600));
                 }
-
                 return ResponseFacade::json([
                     'status' => 401,
                     'code' => 'password.invalid',
@@ -81,7 +76,7 @@ class ShareLinkController
         }
 
         $res = $model->resource;
-        if (is_string($res)) {
+    if (is_string($res)) {
             // Local file path
             if (file_exists($res)) {
                 event(new ShareLinkAccessed($model));
@@ -97,12 +92,12 @@ class ShareLinkController
                 if ($xAccel !== '') {
                     // Map real path to internal prefix if needed; here we assume res is already under the internal location
                     return ResponseFacade::make('', 200, [
-                        'X-Accel-Redirect' => mb_rtrim($xAccel, '/').'/'.mb_ltrim(basename($res), '/'),
+                        'X-Accel-Redirect' => rtrim($xAccel, '/').'/'.ltrim(basename($res), '/'),
                         'Content-Disposition' => (new ResponseHeaderBag())->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, basename($res)),
                         'Cache-Control' => 'no-store',
                     ]);
                 }
-                $mime = function_exists('mime_content_type') ? (mime_content_type($res) ?: 'application/octet-stream') : 'application/octet-stream';
+                $mime = \function_exists('mime_content_type') ? (mime_content_type($res) ?: 'application/octet-stream') : 'application/octet-stream';
                 $size = @filesize($res) ?: null;
 
                 // Handle HTTP Range for partial content when size known
@@ -122,12 +117,12 @@ class ShareLinkController
                                 @fseek($fh, $start);
                                 $remaining = $length;
                                 while ($remaining > 0 && ! feof($fh)) {
-                                    $chunk = fread($fh, min(8192, $remaining));
+                                    $chunk = fread($fh, (int) min(8192, $remaining));
                                     if ($chunk === false) {
                                         break;
                                     }
                                     echo $chunk;
-                                    $remaining -= mb_strlen($chunk);
+                                    $remaining -= strlen($chunk);
                                 }
                                 @fclose($fh);
                             }, 206, [
@@ -182,7 +177,7 @@ class ShareLinkController
                     try {
                         $size = $fs->size($path);
                         $headers['Content-Length'] = (string) $size;
-                    } catch (Throwable) {
+                    } catch (\Throwable) {
                         // ignore if driver does not support size
                     }
 
@@ -192,6 +187,37 @@ class ShareLinkController
                             fclose($stream);
                         }
                     }, $filename, $headers);
+                }
+            }
+        }
+
+        // Route target resource: redirect to a named route with params
+        if (is_array($res)) {
+            $type = (string) ($res['type'] ?? '');
+            if ($type === 'route') {
+                $name = (string) ($res['name'] ?? '');
+                $params = (array) ($res['params'] ?? []);
+                if ($name !== '') {
+                    event(new ShareLinkAccessed($model));
+                    return redirect()->route($name, $params);
+                }
+            }
+            if ($type === 'model') {
+                $cls = (string) ($res['class'] ?? '');
+                $id = $res['id'] ?? null;
+                if ($cls !== '' && $id !== null) {
+                    // Defer to app-defined preview route, passing class and id
+                    if (config('app.debug')) {
+                        // Fallback simple JSON when no preview route defined
+                        event(new ShareLinkAccessed($model));
+                        return ResponseFacade::json([
+                            'status' => 200,
+                            'code' => 'sharelink.model_preview',
+                            'title' => 'Model preview',
+                            'detail' => 'App should define a route to present this model.',
+                            'model' => ['class' => $cls, 'id' => $id],
+                        ], 200);
+                    }
                 }
             }
         }

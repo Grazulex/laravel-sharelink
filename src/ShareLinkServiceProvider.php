@@ -11,6 +11,8 @@ use Grazulex\ShareLink\Console\RevokeShareLink;
 use Grazulex\ShareLink\Services\ShareLinkManager;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Events\Dispatcher;
+use Grazulex\ShareLink\Support\ShareLinkObserver;
 
 class ShareLinkServiceProvider extends ServiceProvider
 {
@@ -48,6 +50,13 @@ class ShareLinkServiceProvider extends ServiceProvider
                     $schedule->command('sharelink:prune')->cron($expr)->name('sharelink:prune');
                 }
             });
+        }
+
+        // Subscribe to events for observability (logs/metrics)
+        /** @var Dispatcher $events */
+        $events = $this->app['events'];
+        if ((bool) config('sharelink.observability.enabled', true)) {
+            $events->subscribe(ShareLinkObserver::class);
         }
     }
 }

@@ -9,6 +9,7 @@ use Grazulex\ShareLink\Models\ShareLink;
 use Grazulex\ShareLink\Services\ShareLinkManager;
 use Grazulex\ShareLink\Services\ShareLinkRevoker;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Response as ResponseFacade;
 
 class ManageShareLinkController
@@ -25,8 +26,21 @@ class ManageShareLinkController
             ], 404);
         }
 
-        $revoker = new ShareLinkRevoker();
-        $revoker->revoke($model);
+        // Optional gate authorization
+        $ability = config('sharelink.management.gate');
+        if (is_string($ability) && $ability !== '') {
+            if (Gate::denies($ability, $model)) {
+                return ResponseFacade::json([
+                    'status' => 403,
+                    'code' => 'sharelink.forbidden',
+                    'title' => 'Forbidden',
+                    'detail' => 'You are not authorized to manage this link.',
+                ], 403);
+            }
+        }
+
+    $revoker = new ShareLinkRevoker();
+    $revoker->revoke($model);
 
         return (new ShareLinkResource($model))->response();
     }
@@ -51,6 +65,19 @@ class ManageShareLinkController
                 'title' => 'Share link not found',
                 'detail' => 'No link matches this token.',
             ], 404);
+        }
+
+        // Optional gate authorization
+        $ability = config('sharelink.management.gate');
+        if (is_string($ability) && $ability !== '') {
+            if (Gate::denies($ability, $model)) {
+                return ResponseFacade::json([
+                    'status' => 403,
+                    'code' => 'sharelink.forbidden',
+                    'title' => 'Forbidden',
+                    'detail' => 'You are not authorized to manage this link.',
+                ], 403);
+            }
         }
 
         $manager->extend($model, $hours);

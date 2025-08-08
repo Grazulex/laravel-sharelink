@@ -14,6 +14,9 @@ return [
         'middleware' => [
             // e.g., 'web', 'auth' — left empty by default for tests
         ],
+    // Optional Gate ability to authorize management actions (revoke/extend) against the ShareLink model
+    // Example: set to 'manage-sharelinks' and define Gate::define('manage-sharelinks', fn ($user, $link) => ...)
+    'gate' => env('SHARELINK_MANAGEMENT_GATE', null),
     ],
     'signed' => [
         // If enabled, helper methods will generate signed URLs; when required, access must be signed
@@ -68,5 +71,12 @@ return [
             'expression' => env('SHARELINK_SCHEDULE_PRUNE_EXPRESSION', '0 3 * * *'),
             'description' => 'sharelink:prune',
         ],
+    ],
+
+    'observability' => [
+        'enabled' => env('SHARELINK_OBSERVABILITY_ENABLED', true),
+        'log' => env('SHARELINK_OBSERVABILITY_LOG', true),
+        'metrics' => env('SHARELINK_OBSERVABILITY_METRICS', false),
+        // no tokens/IPs in logs; only non-PII fields are included
     ],
 ];

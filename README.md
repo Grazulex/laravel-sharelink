@@ -12,6 +12,8 @@ Documentation: see the GitHub Wiki
 - Security: wiki/Security
 - Events: wiki/Events
 - CLI: wiki/CLI
+ - Changelog: wiki/Changelog
+ - Version Matrix: wiki/Version%20Matrix
 
 - Expirations, click limits, password protection
 - Revocation and cleanup commands

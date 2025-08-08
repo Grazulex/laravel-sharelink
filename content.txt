@@ -1,0 +1,41 @@
+# Laravel ShareLink
+
+**Laravel ShareLink** lets you generate, manage, and secure **temporary share links** to any resource in your Laravel app: files, model previews, routes, or even API endpoints. It centralizes issuance, expiration, revocation, access limits, and usage analytics — all with clean helpers and a simple facade.
+
+## Key features
+- Signed, unique links with **expiration** (date/time or duration)
+- **Usage limits** (e.g., max N clicks) and password protection (bcrypt hashed)
+- **Revocation** at any time and automatic cleanup
+- Central **storage and audit** (click count, first/last access, IPs)
+- Works with files (Storage), routes, and model previews (morph targets)
+- Artisan commands, policies-ready, and optional Nova/Filament widgets
+
+## Quick example
+```php
+use Grazulex\ShareLink\Facades\ShareLink;
+
+// Create a link for a file expiring in 2 hours, max 3 clicks, password-protected
+$link = ShareLink::create(resource: storage_path('app/public/reports/sales.pdf'))
+    ->expiresIn(hours: 2)
+    ->maxClicks(3)
+    ->withPassword('secret123')
+    ->generate();
+
+echo $link->url; // https://app.test/share/abc123
+```
+
+## Database schema
+`share_links` table
+- id (uuid), resource (json/string), token, password (nullable, hash), expires_at, max_clicks (nullable), click_count, revoked_at (nullable), metadata (json, nullable), created_by (foreignId), created_at/updated_at.
+
+## Security
+- Middleware validates token, expiration, revocation, password (if any), and limits.
+- Uses **bcrypt** for password hashing, supports route signing if desired.
+
+## Roadmap
+- Per-link IP allow/deny lists
+- Rate limits per token
+- One-time “burn after reading” links
+- Web UI components for Nova/Filament
+
+MIT © Grazulex

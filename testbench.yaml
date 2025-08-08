@@ -1,0 +1,5 @@
+workbench:
+  discovers:
+    - commands: true
+providers:
+  - Grazulex\ShareLink\ShareLinkServiceProvider

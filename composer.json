@@ -1,0 +1,94 @@
+{
+  "name": "grazulex/laravel-sharelink",
+  "description": "Generate, manage, and secure temporary share links for files, routes, and model previews.",
+  "keywords": [
+    "laravel",
+    "sharelink",
+    "signed-url",
+    "temporary",
+    "download",
+    "secure",
+    "token",
+    "php8"
+  ],
+  "type": "library",
+  "homepage": "https://github.com/grazulex/laravel-sharelink",
+  "require": {
+    "php": "^8.3",
+    "illuminate/support": "^11.0|^12.0",
+    "nesbot/carbon": "^3.10",
+    "symfony/yaml": "^7.3",
+    "grazulex/laravel-modelschema": "^1.1.0"
+  },
+  "require-dev": {
+    "laravel/pint": "^1.22",
+    "pestphp/pest": "^3.8",
+    "pestphp/pest-plugin-laravel": "^3.2",
+    "larastan/larastan": "^3.4",
+    "rector/rector": "^2.0",
+    "doctrine/dbal": "^4.2",
+    "orchestra/testbench": "^9.0|^10.0"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Grazulex\\ShareLink\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/",
+      "Workbench\\App\\": "workbench/app/",
+      "Workbench\\Database\\Factories\\": "workbench/database/factories/",
+      "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Grazulex\\ShareLink\\ShareLinkServiceProvider"
+      ]
+    }
+  },
+  "authors": [
+    {
+      "name": "Jean-Marc Strauven",
+      "email": "jms@grazulex.be",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/Grazulex/laravel-sharelink/issues",
+    "source": "https://github.com/Grazulex/laravel-sharelink",
+    "wiki": "https://github.com/Grazulex/laravel-sharelink/wiki",
+    "forum": "https://github.com/Grazulex/laravel-sharelink/discussions",
+    "docs": "https://github.com/Grazulex/laravel-sharelink/wiki"
+  },
+  "scripts": {
+    "test": [
+      "./vendor/bin/pest --colors=always --coverage"
+    ],
+    "pint": [
+      "./vendor/bin/pint"
+    ],
+    "phpstan": [
+      "./vendor/bin/phpstan analyse --memory-limit=2G --configuration=phpstan.neon"
+    ],
+    "rector": [
+      "./vendor/bin/rector"
+    ],
+    "full": [
+      "composer run-script pint",
+      "composer run-script phpstan",
+      "composer run-script rector",
+      "composer run-script test"
+    ]
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}

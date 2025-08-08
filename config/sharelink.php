@@ -24,6 +24,12 @@ return [
     ],
 
     'limits' => [
+        'ip' => [
+            // Arrays of IPs or CIDR blocks. If 'allow' is non-empty, only those IPs are allowed.
+            // 'deny' is always enforced; per-link metadata can override/augment (metadata.ip_allow/ip_deny)
+            'allow' => [],
+            'deny' => [],
+        ],
         'rate' => [
             'enabled' => env('SHARELINK_RATE_ENABLED', false),
             // Max attempts allowed within decay seconds per token

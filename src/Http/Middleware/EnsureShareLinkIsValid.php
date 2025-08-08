@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 
 class EnsureShareLinkIsValid
 {
@@ -61,6 +62,55 @@ class EnsureShareLinkIsValid
             ], 429);
         }
 
+        // Global and per-link IP filtering
+        $clientIp = (string) ($request->ip() ?? '');
+        $globalAllow = (array) config('sharelink.limits.ip.allow', []);
+        $globalDeny = (array) config('sharelink.limits.ip.deny', []);
+        $metaAllow = (array) ($model->metadata['ip_allow'] ?? []);
+        $metaDeny = (array) ($model->metadata['ip_deny'] ?? []);
+
+        $allowList = array_values(array_filter(array_merge($globalAllow, $metaAllow), static fn ($v) => is_string($v) && $v !== ''));
+        $denyList = array_values(array_filter(array_merge($globalDeny, $metaDeny), static fn ($v) => is_string($v) && $v !== ''));
+
+        $inList = function (string $ip, array $list): bool {
+            foreach ($list as $entry) {
+                $entry = trim($entry);
+                if ($entry === '') {
+                    continue;
+                }
+                if (Str::contains($entry, '/')) {
+                    // CIDR
+                    if (self::ipInCidr($ip, $entry)) {
+                        return true;
+                    }
+                } else {
+                    if ($ip === $entry) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        };
+
+        if ($clientIp !== '') {
+            if ($inList($clientIp, $denyList)) {
+                return Response::json([
+                    'status' => 403,
+                    'code' => 'sharelink.ip_denied',
+                    'title' => 'Access denied',
+                    'detail' => 'Your IP is not allowed to access this link.',
+                ], 403);
+            }
+            if ($allowList !== [] && ! $inList($clientIp, $allowList)) {
+                return Response::json([
+                    'status' => 403,
+                    'code' => 'sharelink.ip_denied',
+                    'title' => 'Access denied',
+                    'detail' => 'Your IP is not allowed to access this link.',
+                ], 403);
+            }
+        }
+
         // Signed URL validation
         $signedEnabled = (bool) config('sharelink.signed.enabled', true);
         $signedRequired = (bool) config('sharelink.signed.required', false);
@@ -107,5 +157,27 @@ class EnsureShareLinkIsValid
         $request->attributes->set('sharelink', $model);
 
         return $next($request);
+    }
+
+    private static function ipInCidr(string $ip, string $cidr): bool
+    {
+        if ($ip === '' || $cidr === '') {
+            return false;
+        }
+        if (! Str::contains($cidr, '/')) {
+            return $ip === $cidr;
+        }
+        [$subnet, $mask] = explode('/', $cidr, 2);
+        $mask = (int) $mask;
+        // Only IPv4 support for now
+        $ipLong = ip2long($ip);
+        $subnetLong = ip2long($subnet);
+        if ($ipLong === false || $subnetLong === false) {
+            return false;
+        }
+        $maskLong = -1 << (32 - $mask);
+        $ipNet = $ipLong & $maskLong;
+        $subnetNet = $subnetLong & $maskLong;
+        return $ipNet === $subnetNet;
     }
 }

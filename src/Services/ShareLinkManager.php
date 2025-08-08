@@ -112,15 +112,3 @@ class PendingShareLink
         return $model;
     }
 }
-
-class ShareLinkRevoker
-{
-    public function revoke(ShareLinkModel $model): ShareLinkModel
-    {
-        $model->revoked_at = now();
-        $model->save();
-        event(new ShareLinkRevoked($model));
-
-        return $model;
-    }
-}

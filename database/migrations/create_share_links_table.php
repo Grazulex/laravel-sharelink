@@ -23,7 +23,25 @@ return new class extends Migration
             $table->string('last_ip', 45)->nullable();
             $table->timestamp('revoked_at')->nullable();
             $table->json('metadata')->nullable();
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+
+            // Add created_by column - flexible approach to handle different user ID types
+            if (config('sharelink.user_tracking.enabled', false)) {
+                $userIdType = config('sharelink.user_tracking.user_id_type', 'bigint');
+                $userTable = config('sharelink.user_tracking.user_table', 'users');
+
+                match ($userIdType) {
+                    'uuid' => $table->uuid('created_by')->nullable(),
+                    'ulid' => $table->ulid('created_by')->nullable(),
+                    'bigint' => $table->foreignId('created_by')->nullable()->constrained($userTable)->nullOnDelete(),
+                    default => $table->unsignedBigInteger('created_by')->nullable(),
+                };
+
+                // Add foreign key constraint only for non-bigint types or when explicitly enabled
+                if ($userIdType !== 'bigint' && config('sharelink.user_tracking.add_foreign_key', true)) {
+                    $table->foreign('created_by')->references('id')->on($userTable)->nullOnDelete();
+                }
+            }
+
             $table->timestamps();
 
             // Helpful indexes

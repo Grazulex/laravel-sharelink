@@ -79,4 +79,15 @@ return [
         'metrics' => env('SHARELINK_OBSERVABILITY_METRICS', false),
         // no tokens/IPs in logs; only non-PII fields are included
     ],
+
+    'user_tracking' => [
+        // Enable user tracking (created_by column)
+        'enabled' => env('SHARELINK_USER_TRACKING_ENABLED', false),
+        // Type of user ID: 'bigint', 'uuid', 'ulid'
+        'user_id_type' => env('SHARELINK_USER_ID_TYPE', 'bigint'),
+        // User table name
+        'user_table' => env('SHARELINK_USER_TABLE', 'users'),
+        // Add foreign key constraint (set to false if you want to handle it manually)
+        'add_foreign_key' => env('SHARELINK_ADD_FOREIGN_KEY', true),
+    ],
 ];

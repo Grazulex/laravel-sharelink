@@ -30,7 +30,7 @@ class ShareLink extends Model
 
     protected $fillable = [
         'resource', 'token', 'password', 'expires_at', 'max_clicks', 'click_count',
-        'revoked_at', 'metadata', 'created_by',
+        'revoked_at', 'metadata',
     ];
 
     protected $casts = [
@@ -41,6 +41,20 @@ class ShareLink extends Model
         'last_access_at' => 'datetime',
         'revoked_at' => 'datetime',
     ];
+
+    /**
+     * Get the fillable attributes including created_by if user tracking is enabled.
+     */
+    public function getFillable(): array
+    {
+        $fillable = $this->fillable;
+
+        if (config('sharelink.user_tracking.enabled', false)) {
+            $fillable[] = 'created_by';
+        }
+
+        return $fillable;
+    }
 
     public function isExpired(): bool
     {

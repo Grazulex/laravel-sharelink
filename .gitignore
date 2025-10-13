@@ -29,3 +29,7 @@ package-lock.json
 cache.sqlite
 /build
 /workbench
+
+# Claude Code
+.claude/
+.claude_history

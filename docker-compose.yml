@@ -1,0 +1,26 @@
+services:
+  # PHP 8.3 pour développement de package Laravel
+  php:
+    image: php:8.3-cli
+    container_name: ${PROJECT_NAME:-laravel-sharelink}_php83
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - app-network
+    environment:
+      - PHP_IDE_CONFIG=serverName=Docker
+    command:
+      - bash
+      - -c
+      - |
+        apt-get update && apt-get install -y libzip-dev libonig-dev libxml2-dev git unzip curl sqlite3 libsqlite3-dev &&
+        docker-php-ext-install -j$$(nproc) pdo pdo_sqlite mbstring pcntl zip &&
+        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer &&
+        git config --global --add safe.directory /var/www/html &&
+        if [ ! -d "vendor" ]; then composer install --no-interaction; fi &&
+        tail -f /dev/null
+
+networks:
+  app-network:
+    driver: bridge

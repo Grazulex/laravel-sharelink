@@ -9,10 +9,16 @@ use Grazulex\ShareLink\Events\ShareLinkCreated;
 use Grazulex\ShareLink\Models\ShareLink as ShareLinkModel;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
+use InvalidArgumentException;
 
 class ShareLinkManager
 {
-    public function create(string $resource): PendingShareLink
+    /**
+     * Create a new share link for a resource.
+     *
+     * @param  string|array<string, mixed>  $resource  File path or array (route/model definition)
+     */
+    public function create(string|array $resource): PendingShareLink
     {
         return new PendingShareLink($resource);
     }
@@ -51,8 +57,15 @@ class PendingShareLink
 {
     protected array $data;
 
-    public function __construct(string $resource)
+    /**
+     * @param  string|array<string, mixed>  $resource  File path or array (route/model definition)
+     */
+    public function __construct(string|array $resource)
     {
+        if (is_array($resource)) {
+            $this->validateArrayResource($resource);
+        }
+
         $this->data = [
             'resource' => $resource,
             'click_count' => 0,
@@ -109,5 +122,39 @@ class PendingShareLink
         event(new ShareLinkCreated($model));
 
         return $model;
+    }
+
+    /**
+     * Validate array resource structure.
+     *
+     * @param  array<string, mixed>  $resource
+     *
+     * @throws InvalidArgumentException
+     */
+    private function validateArrayResource(array $resource): void
+    {
+        $type = $resource['type'] ?? null;
+
+        if ($type === null) {
+            throw new InvalidArgumentException('Array resource must have a "type" key.');
+        }
+
+        if ($type === 'route') {
+            if (! isset($resource['name']) || ! is_string($resource['name']) || $resource['name'] === '') {
+                throw new InvalidArgumentException('Route resource must have a non-empty "name" key.');
+            }
+            if (isset($resource['params']) && ! is_array($resource['params'])) {
+                throw new InvalidArgumentException('Route resource "params" must be an array.');
+            }
+        } elseif ($type === 'model') {
+            if (! isset($resource['class']) || ! is_string($resource['class']) || $resource['class'] === '') {
+                throw new InvalidArgumentException('Model resource must have a non-empty "class" key.');
+            }
+            if (! isset($resource['id'])) {
+                throw new InvalidArgumentException('Model resource must have a non-null "id" key.');
+            }
+        } else {
+            throw new InvalidArgumentException('Array resource type must be "route" or "model". Got: '.$type);
+        }
     }
 }

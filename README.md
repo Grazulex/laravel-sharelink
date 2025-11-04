@@ -284,7 +284,7 @@ Laravel ShareLink is maintained by **Jean-Marc Strauven**, creator of 17+ Larave
 
 ### 📬 Let's Talk:
 - 📧 [jms@grazulex.be](mailto:jms@grazulex.be)
-- 💼 [LinkedIn Profile](https://www.linkedin.com/in/jean-marcstrauven)
+- 💼 [LinkedIn Profile](https://www.linkedin.com/in/jean-marc-strauven)
 - 💻 [Available on Malt](https://www.malt.be)
 
 💡 **Building a Laravel SaaS or need custom features?** I'd love to help bring your project to life.

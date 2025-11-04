@@ -249,3 +249,52 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
   <strong>Laravel ShareLink</strong> - Secure, time-limited sharing for Laravel applications<br>
   with comprehensive audit trails and advanced security features.
 </div>
+
+---
+
+## 💼 Need Custom Laravel Solutions?
+
+Laravel ShareLink is maintained by **Jean-Marc Strauven**, creator of 17+ Laravel packages.
+
+### 🚀 I Can Help With:
+
+**🔐 Secure File Sharing & Access Control**
+- Custom file management systems
+- Advanced permission systems
+- Temporary access solutions
+- Integration with cloud storage (S3, Azure, etc.)
+
+**📦 Custom Laravel Package Development**
+- Build tailored packages for your specific needs
+- Internal tools for your team
+- Integration with third-party services
+- **€5,000-€10,000** depending on complexity
+
+**🏗️ Complete Laravel Applications**
+- SaaS platforms
+- Document management systems
+- Collaboration tools
+- **€8,000-€15,000** for MVP
+
+### 👨‍💻 About Me:
+- 15+ years Laravel/PHP expertise
+- Ex-CTO at Delcampe (millions of users)
+- Chapter Lead at BNP Paribas Fortis
+- 6,000+ package downloads across 17+ packages
+
+### 📬 Let's Talk:
+- 📧 [jms@grazulex.be](mailto:jms@grazulex.be)
+- 💼 [LinkedIn Profile](https://www.linkedin.com/in/jean-marcstrauven)
+- 💻 [Available on Malt](https://www.malt.be)
+
+💡 **Building a Laravel SaaS or need custom features?** I'd love to help bring your project to life.
+
+---
+
+## ⭐ Show Your Support
+
+If Laravel ShareLink is useful for your project:
+- Give it a ⭐ on GitHub
+- Share it with other Laravel developers
+- [Sponsor my work](https://github.com/sponsors/Grazulex) ❤️
+

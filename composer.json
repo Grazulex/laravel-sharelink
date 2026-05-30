@@ -15,7 +15,7 @@
   "homepage": "https://github.com/grazulex/laravel-sharelink",
   "require": {
     "php": "^8.3",
-    "illuminate/support": "^11.0|^12.0",
+    "illuminate/support": "^11.0|^12.0|^13.0",
     "nesbot/carbon": "^3.10",
     "symfony/yaml": "^7.3"
   },

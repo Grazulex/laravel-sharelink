@@ -16,17 +16,13 @@ jobs:
       fail-fast: true
       matrix:
         php: [8.3, 8.4]
-        laravel: [11.*, 12.*]
+        laravel: [12.*, 13.*]
         dependency-version: [prefer-lowest, prefer-stable]
         include:
-          - laravel: 11.*
-            testbench: 9.*
           - laravel: 12.*
             testbench: 10.*
-        exclude:
-          - php: 8.3
-            laravel: 12.*
-            dependency-version: prefer-lowest
+          - laravel: 13.*
+            testbench: 11.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
@@ -38,7 +34,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
           coverage: none
 
       - name: Setup problem matchers

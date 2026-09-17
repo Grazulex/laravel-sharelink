@@ -11,7 +11,7 @@
   [![Total Downloads](https://img.shields.io/packagist/dt/grazulex/laravel-sharelink.svg?style=flat-square)](https://packagist.org/packages/grazulex/laravel-sharelink)
   [![License](https://img.shields.io/github/license/grazulex/laravel-sharelink.svg?style=flat-square)](https://github.com/Grazulex/laravel-sharelink/blob/main/LICENSE.md)
   [![PHP Version](https://img.shields.io/packagist/php-v/grazulex/laravel-sharelink.svg?style=flat-square)](https://php.net/)
-  [![Laravel Version](https://img.shields.io/badge/laravel-11.x%20%7C%2012.x-ff2d20?style=flat-square&logo=laravel)](https://laravel.com/)
+  [![Laravel Version](https://img.shields.io/badge/laravel-12.x%20%7C%2013.x-ff2d20?style=flat-square&logo=laravel)](https://laravel.com/)
   [![Tests](https://img.shields.io/github/actions/workflow/status/grazulex/laravel-sharelink/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/Grazulex/laravel-sharelink/actions)
   [![Code Style](https://img.shields.io/badge/code%20style-pint-000000?style=flat-square&logo=laravel)](https://github.com/laravel/pint)
 </div>
@@ -137,7 +137,7 @@ $signedUrl = ShareLink::signedUrl($link, now()->addHour());
 ## 🔧 Requirements
 
 - **PHP 8.3+**
-- **Laravel 11.0+ | 12.0+**
+- **Laravel 12.0+ | 13.0+**
 
 ## 📚 Complete Documentation
 

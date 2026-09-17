@@ -15,18 +15,18 @@
   "homepage": "https://github.com/grazulex/laravel-sharelink",
   "require": {
     "php": "^8.3",
-    "illuminate/support": "^11.0|^12.0",
+    "illuminate/support": "^12.0|^13.0",
     "nesbot/carbon": "^3.10",
     "symfony/yaml": "^7.3"
   },
   "require-dev": {
-    "laravel/pint": "1.24.0",
-    "pestphp/pest": "^3.8",
-    "pestphp/pest-plugin-laravel": "^3.2",
+    "laravel/pint": "^1.24",
+    "pestphp/pest": "^3.8|^4.0",
+    "pestphp/pest-plugin-laravel": "^3.2|^4.0",
     "larastan/larastan": "^3.4",
     "rector/rector": "^2.0",
     "doctrine/dbal": "^4.2",
-    "orchestra/testbench": "^9.0|^10.0"
+    "orchestra/testbench": "^10.0|^11.0"
   },
   "minimum-stability": "stable",
   "prefer-stable": true,

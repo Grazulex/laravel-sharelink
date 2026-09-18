@@ -16,6 +16,12 @@
   [![Code Style](https://img.shields.io/badge/code%20style-pint-000000?style=flat-square&logo=laravel)](https://github.com/laravel/pint)
 </div>
 
+> [!TIP]
+> **What Laravel ShareLink does for you** — Share a file, a route or a model through a secure, expiring link — with optional password, download limits and a complete access log. Temporary access in a few lines, not a weekend project.
+>
+> **This package is free and maintained on my own time.** If it saves you hours, a small contribution helps me keep it going:
+> [💖 GitHub Sponsors](https://github.com/sponsors/Grazulex) · [☕ Buy Me a Coffee](https://buymeacoffee.com/grazulex) · [PayPal](https://paypal.me/strauven)
+
 ---
 
 ## 🚀 Overview

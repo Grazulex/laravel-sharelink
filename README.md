@@ -142,7 +142,7 @@ $signedUrl = ShareLink::signedUrl($link, now()->addHour());
 
 ## 🔧 Requirements
 
-- **PHP 8.3+**
+- **PHP 8.4+**
 - **Laravel 12.0+ | 13.0+**
 
 ## 📚 Complete Documentation

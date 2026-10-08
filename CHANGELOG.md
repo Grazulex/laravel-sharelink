@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.4.0] - 2026-10-08
+
 ### Changed
+- **Minimum PHP version is now 8.4**: PHP 8.3 is no longer supported (#17)
+- CI test matrix now runs PHP 8.4 and 8.5 (#17)
+- `docker-compose.yml` development container now uses PHP 8.4 (#17)
 - Rector configuration updated for Rector 2.x (the removed `strictBooleans` prepared set was breaking `vendor/bin/rector`); Rector applied to `src/`.
 - GitHub Actions bumped: `actions/checkout` v4 -> v5, `softprops/action-gh-release` v1 -> v2.
 
@@ -44,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release: temporary share links for files, routes and model previews with expiration, click limits, password protection, rate limiting, IP filtering, signed URLs, burn-after-reading, auditing and Artisan commands.
 
+[v1.4.0]: https://github.com/Grazulex/laravel-sharelink/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/Grazulex/laravel-sharelink/compare/V1.2.0...v1.3.0
 [v1.2.0]: https://github.com/Grazulex/laravel-sharelink/compare/v1.1.0...V1.2.0
 [v1.1.0]: https://github.com/Grazulex/laravel-sharelink/compare/v1.0.0...v1.1.0

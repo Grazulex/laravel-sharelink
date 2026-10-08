@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Laravel ShareLink is a comprehensive Laravel package for generating secure, time-limited sharing capabilities. It allows applications to share files, routes, and model previews with advanced security features including password protection, IP filtering, rate limiting, and audit trails.
 
 **Package Name**: `grazulex/laravel-sharelink`
-**Requirements**: PHP 8.3+, Laravel 11.x | 12.x
+**Requirements**: PHP 8.4+, Laravel 11.x | 12.x
 
 ## Development Commands
 

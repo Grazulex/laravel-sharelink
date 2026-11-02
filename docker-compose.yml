@@ -1,8 +1,8 @@
 services:
-  # PHP 8.3 pour développement de package Laravel
+  # PHP 8.4 pour développement de package Laravel
   php:
-    image: php:8.3-cli
-    container_name: ${PROJECT_NAME:-laravel-sharelink}_php83
+    image: php:8.4-cli
+    container_name: ${PROJECT_NAME:-laravel-sharelink}_php84
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html

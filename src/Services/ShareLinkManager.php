@@ -88,7 +88,7 @@ class PendingShareLink
 
     public function withPassword(?string $password): self
     {
-        $this->data['password'] = $password !== null && $password !== '' && $password !== '0' ? Hash::make($password) : null;
+        $this->data['password'] = ! in_array($password, [null, '', '0'], true) ? Hash::make($password) : null;
 
         return $this;
     }

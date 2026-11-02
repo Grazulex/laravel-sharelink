@@ -28,7 +28,7 @@ class CreateShareLink extends Command
         $builder = $manager->create($resource);
 
         $expires = $this->option('expires');
-        if ($expires !== null && $expires !== '' && $expires !== '0') {
+        if (! in_array($expires, [null, '', '0'], true)) {
             $builder->expiresIn((int) $expires);
         }
 

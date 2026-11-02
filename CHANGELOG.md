@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.4.1] - 2026-11-02
+
+### Changed
+- Dev dependencies updated: Pint `^1.32`, Pest `^3.8|^4.7`, Pest Laravel plugin `^3.2|^4.1`, Larastan `^3.13`, Rector `^2.8`, `doctrine/dbal` `^4.5`.
+- `nesbot/carbon` now requires `^3.15`; `symfony/yaml` now accepts `^7.4|^8.1`.
+
 ## [v1.4.0] - 2026-10-08
 
 ### Changed

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Restore the `php` `^8.4` and `illuminate/support` `^12.0|^13.0` constraints. Merging #13, opened against an older `composer.json`, had reverted them to `^8.3` and `^11.0|^12.0|^13.0` in v1.4.1, re-allowing PHP 8.3 and Laravel 11, both dropped earlier (v1.4.0 and v1.3.0).
+
 ## [v1.4.1] - 2026-11-02
 
 ### Changed

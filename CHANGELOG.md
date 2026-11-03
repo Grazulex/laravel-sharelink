@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.4.2] - 2026-11-03
+
+### Fixed
+- Restore the `php` `^8.4` and `illuminate/support` `^12.0|^13.0` constraints. Merging #13, opened against an older `composer.json`, had reverted them to `^8.3` and `^11.0|^12.0|^13.0` in v1.4.1, re-allowing PHP 8.3 and Laravel 11, both dropped earlier (v1.4.0 and v1.3.0).
+
 ## [v1.4.1] - 2026-11-02
 
 ### Changed
@@ -55,6 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release: temporary share links for files, routes and model previews with expiration, click limits, password protection, rate limiting, IP filtering, signed URLs, burn-after-reading, auditing and Artisan commands.
 
+[v1.4.2]: https://github.com/Grazulex/laravel-sharelink/compare/v1.4.1...v1.4.2
+[v1.4.1]: https://github.com/Grazulex/laravel-sharelink/compare/v1.4.0...v1.4.1
 [v1.4.0]: https://github.com/Grazulex/laravel-sharelink/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/Grazulex/laravel-sharelink/compare/V1.2.0...v1.3.0
 [v1.2.0]: https://github.com/Grazulex/laravel-sharelink/compare/v1.1.0...V1.2.0

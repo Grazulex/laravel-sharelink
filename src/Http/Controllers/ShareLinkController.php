@@ -6,6 +6,7 @@ namespace Grazulex\ShareLink\Http\Controllers;
 
 use Grazulex\ShareLink\Events\ShareLinkAccessed;
 use Grazulex\ShareLink\Http\Resources\ShareLinkResource;
+use Grazulex\ShareLink\Models\ShareLink;
 use Grazulex\ShareLink\Services\ShareLinkRevoker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -21,6 +22,7 @@ class ShareLinkController
 {
     public function show(Request $request, string $token)
     {
+        /** @var ShareLink $model */
         $model = $request->attributes->get('sharelink');
 
         // Optional password gate with throttling
@@ -57,6 +59,16 @@ class ShareLinkController
             }
         }
 
+        // Download limit (separate from max_clicks): only applies to file deliveries
+        if ($model->hasReachedDownloadLimit() && $this->isFileResource($model->resource)) {
+            return ResponseFacade::json([
+                'status' => 429,
+                'code' => 'sharelink.download_limit_reached',
+                'title' => 'Download limit reached',
+                'detail' => 'This link has reached its maximum number of downloads.',
+            ], 429);
+        }
+
         // Increment usage and mark audit
         $model->incrementClicks();
         $model->markAccessed($request->ip());
@@ -88,6 +100,8 @@ class ShareLinkController
                 // X-Sendfile / X-Accel-Redirect
                 $xAccel = (string) (config('sharelink.delivery.x_accel_redirect') ?? '');
                 if (config('sharelink.delivery.x_sendfile') === true) {
+                    $this->countDownload($request, $model);
+
                     return ResponseFacade::make('', 200, [
                         'X-Sendfile' => $res,
                         'Content-Disposition' => (new ResponseHeaderBag())->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, basename($res)),
@@ -95,6 +109,8 @@ class ShareLinkController
                     ]);
                 }
                 if ($xAccel !== '') {
+                    $this->countDownload($request, $model);
+
                     // Map real path to internal prefix if needed; here we assume res is already under the internal location
                     return ResponseFacade::make('', 200, [
                         'X-Accel-Redirect' => mb_rtrim($xAccel, '/').'/'.mb_ltrim(basename($res), '/'),
@@ -113,6 +129,11 @@ class ShareLinkController
                         $end = isset($m[2]) ? (int) $m[2] : ($size - 1);
                         if ($start <= $end && $end < $size) {
                             $length = ($end - $start) + 1;
+
+                            // Only the first chunk of a ranged transfer counts as a download
+                            if ($start === 0) {
+                                $this->countDownload($request, $model);
+                            }
 
                             return ResponseFacade::stream(function () use ($res, $start, $length): void {
                                 $fh = @fopen($res, 'rb');
@@ -158,6 +179,8 @@ class ShareLinkController
                     $headers['Content-Length'] = (string) $size;
                 }
 
+                $this->countDownload($request, $model);
+
                 $response = response()->download($res, basename($res), $headers);
                 // Ensure disposition as attachment preserves filename
                 $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, basename($res));
@@ -185,6 +208,8 @@ class ShareLinkController
                     } catch (Throwable) {
                         // ignore if driver does not support size
                     }
+
+                    $this->countDownload($request, $model);
 
                     return ResponseFacade::streamDownload(function () use ($stream): void {
                         if (is_resource($stream)) {
@@ -235,5 +260,42 @@ class ShareLinkController
         }
 
         return ResponseFacade::json((new ShareLinkResource($model))->toArray($request));
+    }
+
+    /**
+     * Record an actual download. HEAD requests only expose headers and are not counted.
+     */
+    private function countDownload(Request $request, ShareLink $model): void
+    {
+        if ($request->isMethod('HEAD')) {
+            return;
+        }
+
+        $model->incrementDownloads();
+    }
+
+    /**
+     * Whether the resource resolves to a deliverable file (local path or disk:path).
+     */
+    private function isFileResource(mixed $res): bool
+    {
+        if (! is_string($res)) {
+            return false;
+        }
+
+        if (file_exists($res)) {
+            return true;
+        }
+
+        if (! str_contains($res, ':')) {
+            return false;
+        }
+
+        [$disk, $path] = explode(':', $res, 2);
+        try {
+            return Storage::disk($disk)->exists($path);
+        } catch (Throwable) {
+            return false;
+        }
     }
 }

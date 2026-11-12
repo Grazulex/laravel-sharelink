@@ -34,6 +34,11 @@ class ShareLinkServiceProvider extends ServiceProvider
             ], 'sharelink-migrations');
         }
 
+        // Upgrade path for existing installations: adds the download_count column
+        $this->publishes([
+            __DIR__.'/../database/migrations/add_download_count_to_share_links_table.php' => database_path('migrations/'.date('Y_m_d_His').'_add_download_count_to_share_links_table.php'),
+        ], 'sharelink-migrations-download-count');
+
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
 
         if ($this->app->runningInConsole()) {

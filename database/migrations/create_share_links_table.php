@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable();
             $table->unsignedInteger('max_clicks')->nullable();
             $table->unsignedInteger('click_count')->default(0);
+            $table->unsignedInteger('download_count')->default(0);
             $table->timestamp('first_access_at')->nullable();
             $table->timestamp('last_access_at')->nullable();
             $table->string('last_ip', 45)->nullable();

@@ -38,6 +38,9 @@ return [
     ],
 
     'limits' => [
+        // Default maximum number of actual file downloads per link (null or 0 = unlimited).
+        // Counted separately from clicks (download_count); per-link metadata.max_downloads overrides it.
+        'max_downloads' => env('SHARELINK_MAX_DOWNLOADS', null),
         'ip' => [
             // Arrays of IPs or CIDR blocks. If 'allow' is non-empty, only those IPs are allowed.
             // 'deny' is always enforced; per-link metadata can override/augment (metadata.ip_allow/ip_deny)

@@ -6,6 +6,7 @@ namespace Grazulex\ShareLink\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 /**
@@ -19,6 +20,7 @@ use Illuminate\Support\Str;
  * @property string|null $last_ip
  * @property int|null $max_clicks
  * @property int $click_count
+ * @property int $download_count
  * @property \Illuminate\Support\Carbon|null $revoked_at
  * @property array|null $metadata
  */
@@ -30,7 +32,7 @@ class ShareLink extends Model
 
     protected $fillable = [
         'resource', 'token', 'password', 'expires_at', 'max_clicks', 'click_count',
-        'revoked_at', 'metadata',
+        'download_count', 'revoked_at', 'metadata',
     ];
 
     protected $casts = [
@@ -69,6 +71,72 @@ class ShareLink extends Model
     public function incrementClicks(): void
     {
         $this->increment('click_count');
+    }
+
+    /**
+     * Whether the underlying table has the download_count column
+     * (installations that did not run the upgrade migration do not).
+     */
+    public function hasDownloadCounter(): bool
+    {
+        if (array_key_exists('download_count', $this->attributes)) {
+            return true;
+        }
+
+        return Schema::connection($this->getConnectionName())->hasColumn($this->getTable(), 'download_count');
+    }
+
+    /**
+     * Number of actual file downloads (0 when the column is not available).
+     */
+    public function downloadCount(): int
+    {
+        return (int) ($this->attributes['download_count'] ?? 0);
+    }
+
+    /**
+     * Increment the download counter. No-op when the column is not available.
+     */
+    public function incrementDownloads(): void
+    {
+        if (! $this->exists || ! $this->hasDownloadCounter()) {
+            return;
+        }
+
+        if (! array_key_exists('download_count', $this->attributes)) {
+            // Freshly created instance: load the current value without marking it dirty
+            $this->attributes['download_count'] = (int) static::query()->whereKey($this->getKey())->value('download_count');
+            $this->syncOriginalAttribute('download_count');
+        }
+
+        $this->increment('download_count');
+    }
+
+    /**
+     * Effective download limit: per-link metadata "max_downloads" first, then the
+     * global "sharelink.limits.max_downloads" option. Null or 0 means unlimited.
+     */
+    public function maxDownloads(): ?int
+    {
+        $metadata = is_array($this->metadata) ? $this->metadata : [];
+        $value = array_key_exists('max_downloads', $metadata) && $metadata['max_downloads'] !== null
+            ? $metadata['max_downloads']
+            : config('sharelink.limits.max_downloads');
+
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        $value = (int) $value;
+
+        return $value > 0 ? $value : null;
+    }
+
+    public function hasReachedDownloadLimit(): bool
+    {
+        $max = $this->maxDownloads();
+
+        return $max !== null && $this->downloadCount() >= $max;
     }
 
     public function markAccessed(?string $ip): void

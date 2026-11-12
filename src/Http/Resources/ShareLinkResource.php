@@ -26,6 +26,7 @@ class ShareLinkResource extends JsonResource
             'resource' => $model->resource,
             'metadata' => $model->metadata,
             'clicks' => $model->click_count,
+            'downloads' => $model->downloadCount(),
         ];
     }
 }

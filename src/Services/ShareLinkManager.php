@@ -57,6 +57,10 @@ class PendingShareLink
 {
     protected array $data;
 
+    private ?int $maxDownloads = null;
+
+    private bool $maxDownloadsSet = false;
+
     /**
      * @param  string|array<string, mixed>  $resource  File path or array (route/model definition)
      */
@@ -82,6 +86,18 @@ class PendingShareLink
     public function maxClicks(?int $max = null): self
     {
         $this->data['max_clicks'] = $max;
+
+        return $this;
+    }
+
+    /**
+     * Limit the number of actual file downloads (counted separately from clicks).
+     * Null removes the per-link limit (global config applies); 0 means unlimited.
+     */
+    public function maxDownloads(?int $max = null): self
+    {
+        $this->maxDownloads = $max;
+        $this->maxDownloadsSet = true;
 
         return $this;
     }
@@ -117,6 +133,15 @@ class PendingShareLink
     {
         if (! isset($this->data['token']) || $this->data['token'] === '') {
             $this->data['token'] = \Illuminate\Support\Str::random(32);
+        }
+        if ($this->maxDownloadsSet) {
+            if ($this->maxDownloads !== null) {
+                $meta = (array) ($this->data['metadata'] ?? []);
+                $meta['max_downloads'] = $this->maxDownloads;
+                $this->data['metadata'] = $meta;
+            } elseif (is_array($this->data['metadata'] ?? null)) {
+                unset($this->data['metadata']['max_downloads']);
+            }
         }
         $model = ShareLinkModel::create($this->data);
         event(new ShareLinkCreated($model));

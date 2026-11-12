@@ -14,6 +14,7 @@ class CreateShareLink extends Command
         {resource : File path or storage reference (disk:path)}
         {--expires= : Expiration in hours}
         {--max-clicks= : Maximum number of clicks}
+        {--max-downloads= : Maximum number of file downloads (0 = unlimited)}
         {--password= : Optional password}
         {--metadata= : JSON metadata}
         {--burn : Burn after reading}
@@ -53,6 +54,11 @@ class CreateShareLink extends Command
 
                 return self::FAILURE;
             }
+        }
+
+        $maxDownloads = $this->option('max-downloads');
+        if ($maxDownloads !== null && $maxDownloads !== '') {
+            $builder->maxDownloads((int) $maxDownloads);
         }
 
         if ((bool) $this->option('burn')) {

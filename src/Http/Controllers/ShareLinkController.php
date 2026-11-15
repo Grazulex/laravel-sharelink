@@ -7,7 +7,9 @@ namespace Grazulex\ShareLink\Http\Controllers;
 use Grazulex\ShareLink\Events\ShareLinkAccessed;
 use Grazulex\ShareLink\Http\Resources\ShareLinkResource;
 use Grazulex\ShareLink\Models\ShareLink;
+use Grazulex\ShareLink\Notifications\ShareLinkAccessed as ShareLinkAccessedNotification;
 use Grazulex\ShareLink\Services\ShareLinkRevoker;
+use Grazulex\ShareLink\Support\ShareLinkNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
@@ -272,6 +274,14 @@ class ShareLinkController
         }
 
         $model->incrementDownloads();
+
+        $max = $model->maxDownloads();
+        if ($max !== null && $model->downloadCount() === $max) {
+            $notifier = app(ShareLinkNotifier::class);
+            if ($notifier->isEnabled('limit_reached')) {
+                $notifier->notify($model, new ShareLinkAccessedNotification($model, ShareLinkAccessedNotification::REASON_DOWNLOAD_LIMIT));
+            }
+        }
     }
 
     /**

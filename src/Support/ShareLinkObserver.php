@@ -9,6 +9,7 @@ use Grazulex\ShareLink\Events\ShareLinkAccessed;
 use Grazulex\ShareLink\Events\ShareLinkCreated;
 use Grazulex\ShareLink\Events\ShareLinkExpired;
 use Grazulex\ShareLink\Events\ShareLinkRevoked;
+use Grazulex\ShareLink\Notifications\ShareLinkAccessed as ShareLinkAccessedNotification;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\Log;
 
@@ -18,8 +19,27 @@ class ShareLinkObserver
     {
         $events->listen(ShareLinkCreated::class, [$this, 'onCreated']);
         $events->listen(ShareLinkAccessed::class, [$this, 'onAccessed']);
+        $events->listen(ShareLinkAccessed::class, [$this, 'notifyOwner']);
         $events->listen(ShareLinkRevoked::class, [$this, 'onRevoked']);
         $events->listen(ShareLinkExpired::class, [$this, 'onExpired']);
+    }
+
+    /**
+     * Notify the link owner on first access and when the click limit is reached.
+     */
+    public function notifyOwner(ShareLinkAccessed $event): void
+    {
+        $notifier = app(ShareLinkNotifier::class);
+        $model = $event->shareLink;
+        $clicks = (int) $model->click_count;
+
+        if ($clicks === 1 && $notifier->isEnabled('first_access')) {
+            $notifier->notify($model, new ShareLinkAccessedNotification($model));
+        }
+
+        if ($model->max_clicks !== null && $clicks === (int) $model->max_clicks && $notifier->isEnabled('limit_reached')) {
+            $notifier->notify($model, new ShareLinkAccessedNotification($model, ShareLinkAccessedNotification::REASON_CLICK_LIMIT));
+        }
     }
 
     public function onCreated(ShareLinkCreated $event): void

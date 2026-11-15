@@ -74,6 +74,26 @@ return [
             'expression' => env('SHARELINK_SCHEDULE_PRUNE_EXPRESSION', '0 3 * * *'),
             'description' => 'sharelink:prune',
         ],
+        'notify_missed' => [
+            // Only registered when notifications are enabled
+            'enabled' => env('SHARELINK_SCHEDULE_NOTIFY_MISSED', true),
+            'expression' => env('SHARELINK_SCHEDULE_NOTIFY_MISSED_EXPRESSION', '0 * * * *'),
+        ],
+    ],
+
+    'notifications' => [
+        // Opt-in: notify the link owner about first access, reached limits and missed deadlines
+        'enabled' => env('SHARELINK_NOTIFICATIONS_ENABLED', false),
+        'channels' => ['mail'],
+        // Fallback recipient (email) when a link has no metadata.notify and no resolvable owner
+        'to' => env('SHARELINK_NOTIFICATIONS_TO', null),
+        // User model used to resolve the owner from created_by (defaults to auth.providers.users.model)
+        'owner_model' => null,
+        'events' => [
+            'first_access' => true,
+            'limit_reached' => true,
+            'deadline_missed' => true,
+        ],
     ],
 
     'observability' => [

@@ -6,6 +6,7 @@ namespace Grazulex\ShareLink;
 
 use Grazulex\ShareLink\Console\CreateShareLink;
 use Grazulex\ShareLink\Console\ListShareLinks;
+use Grazulex\ShareLink\Console\NotifyMissedShareLinks;
 use Grazulex\ShareLink\Console\PruneShareLinks;
 use Grazulex\ShareLink\Console\RevokeShareLink;
 use Grazulex\ShareLink\Services\ShareLinkManager;
@@ -44,6 +45,7 @@ class ShareLinkServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 PruneShareLinks::class,
+                NotifyMissedShareLinks::class,
                 CreateShareLink::class,
                 RevokeShareLink::class,
                 ListShareLinks::class,
@@ -54,13 +56,17 @@ class ShareLinkServiceProvider extends ServiceProvider
                     $expr = (string) config('sharelink.schedule.prune.expression', '0 3 * * *');
                     $schedule->command('sharelink:prune')->cron($expr)->name('sharelink:prune');
                 }
+                if ((bool) config('sharelink.notifications.enabled', false) && (bool) config('sharelink.schedule.notify_missed.enabled', true)) {
+                    $expr = (string) config('sharelink.schedule.notify_missed.expression', '0 * * * *');
+                    $schedule->command('sharelink:notify-missed')->cron($expr)->name('sharelink:notify-missed');
+                }
             });
         }
 
-        // Subscribe to events for observability (logs/metrics)
+        // Subscribe to events for observability (logs/metrics) and owner notifications
         /** @var Dispatcher $events */
         $events = $this->app['events'];
-        if ((bool) config('sharelink.observability.enabled', true)) {
+        if ((bool) config('sharelink.observability.enabled', true) || (bool) config('sharelink.notifications.enabled', false)) {
             $events->subscribe(ShareLinkObserver::class);
         }
     }

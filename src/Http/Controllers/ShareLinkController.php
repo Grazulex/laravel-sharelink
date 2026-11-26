@@ -227,8 +227,8 @@ class ShareLinkController
         if (is_array($res)) {
             $type = (string) ($res['type'] ?? '');
             if ($type === 'route') {
-                $name = (string) ($res['name'] ?? '');
-                $params = (array) ($res['params'] ?? []);
+                $name = (string) ($res['name'] ?? $res['route'] ?? '');
+                $params = (array) ($res['params'] ?? $res['parameters'] ?? []);
                 if ($name !== '') {
                     event(new ShareLinkAccessed($model));
 

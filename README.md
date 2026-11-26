@@ -76,7 +76,7 @@ use Grazulex\ShareLink\Facades\ShareLink;
 
 // Share a file with expiration
 $link = ShareLink::create('/path/to/document.pdf')
-    ->expiresIn(60) // 60 minutes
+    ->expiresIn(1) // 1 hour
     ->maxClicks(5)
     ->withPassword('secret123')
     ->generate();
@@ -88,7 +88,7 @@ echo $link->url; // https://yourapp.com/share/abc123xyz
 ```php
 // Share a local file
 $link = ShareLink::create('/storage/documents/report.pdf')
-    ->expiresIn(1440) // 24 hours
+    ->expiresIn(24) // 24 hours
     ->maxClicks(10)
     ->generate();
 
@@ -104,10 +104,10 @@ $link = ShareLink::create('s3://bucket/private/document.pdf')
 // Share a named route with parameters
 $link = ShareLink::create([
     'type' => 'route',
-    'route' => 'user.profile',
-    'parameters' => ['user' => 123]
+    'name' => 'user.profile',      // alias: 'route'
+    'params' => ['user' => 123],   // alias: 'parameters'
 ])
-->expiresIn(120)
+->expiresIn(2) // 2 hours
 ->generate();
 ```
 

@@ -67,6 +67,7 @@ class PendingShareLink
     public function __construct(string|array $resource)
     {
         if (is_array($resource)) {
+            $resource = $this->normalizeArrayResource($resource);
             $this->validateArrayResource($resource);
         }
 
@@ -150,6 +151,33 @@ class PendingShareLink
     }
 
     /**
+     * Normalize aliased keys of a route resource to their canonical names.
+     *
+     * Canonical keys are "name" and "params"; "route" and "parameters" are
+     * accepted as aliases. When both are given, the canonical key wins.
+     *
+     * @param  array<string, mixed>  $resource
+     * @return array<string, mixed>
+     */
+    private function normalizeArrayResource(array $resource): array
+    {
+        if (($resource['type'] ?? null) !== 'route') {
+            return $resource;
+        }
+
+        foreach (['route' => 'name', 'parameters' => 'params'] as $alias => $canonical) {
+            if (array_key_exists($alias, $resource)) {
+                if (! array_key_exists($canonical, $resource)) {
+                    $resource[$canonical] = $resource[$alias];
+                }
+                unset($resource[$alias]);
+            }
+        }
+
+        return $resource;
+    }
+
+    /**
      * Validate array resource structure.
      *
      * @param  array<string, mixed>  $resource
@@ -166,10 +194,10 @@ class PendingShareLink
 
         if ($type === 'route') {
             if (! isset($resource['name']) || ! is_string($resource['name']) || $resource['name'] === '') {
-                throw new InvalidArgumentException('Route resource must have a non-empty "name" key.');
+                throw new InvalidArgumentException('Route resource must have a non-empty "name" key (or its alias "route").');
             }
             if (isset($resource['params']) && ! is_array($resource['params'])) {
-                throw new InvalidArgumentException('Route resource "params" must be an array.');
+                throw new InvalidArgumentException('Route resource "params" (or its alias "parameters") must be an array.');
             }
         } elseif ($type === 'model') {
             if (! isset($resource['class']) || ! is_string($resource['class']) || $resource['class'] === '') {

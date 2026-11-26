@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Route resources now accept `route` and `parameters` as aliases of the canonical `name` and `params` keys, so the README "Route Sharing" example no longer throws `Route resource must have a non-empty "name" key.` Aliases are normalized to the canonical keys before storage; existing `name`/`params` usage is unchanged (#12).
+- README examples now use the canonical `name`/`params` keys and hour-based `expiresIn()` values (#12).
+
 ## [v1.4.2] - 2026-11-03
 
 ### Fixed
